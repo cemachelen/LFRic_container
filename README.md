@@ -117,6 +117,15 @@ FFLAGS_WARNINGS           = -warn all,noexternal -warn errors
 ```
 Note: `nano` is also available in the container environment.
 
+### Upgrade Psyclone and fix paths
+
+`pip install --upgrade psyclone`
+FPP='cpp -traditional-cpp'
+PSYCLONE_CONFIG='/work/n02/n02/hburns/LFRic_container/LFRic_container/.local/share/psyclone/psyclone.cfg'
+copy -p linux time executable into LFRic_container folder and point to  
+vi /work/n02/n02/hburns/LFRic_container/LFRic_container/trunk/infrastructure/build/compile.mk # path to time
+export FPP PSYCLONE_CONFIG
+
 ## 8 Build executable
 
 ### ARCHER2 Only
