@@ -107,15 +107,17 @@ export PATH=$ROSE_PICKER/bin:$PATH
 
 ````bash
 pip install --upgrade psyclone`
-FPP='cpp -traditional-cpp'
-PATH=".local/bin:${PATH}"
-PSYCLONE_CONFIG='<path-to-container>/.local/share/psyclone/psyclone.cfg'
-PATH=".local/bin:${PATH}"
+export FPP='cpp -traditional-cpp'
+export PATH=".local/bin:${PATH}"
+export PSYCLONE_CONFIG='<path-to-container>/.local/share/psyclone/psyclone.cfg'
+export FC=mpif90
+export LDMPI=mpif90
 ````
 
 copy -p linux time executable into LFRic_container folder and point to in this file: 
 `trunk/infrastructure/build/compile.mk`
 
+copy `mpif90.mk` to trunk/infrastructure/build/fortran/
 
 ## 8 Build executable
 
