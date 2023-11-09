@@ -110,14 +110,14 @@ pip install --upgrade psyclone`
 export FPP='cpp -traditional-cpp'
 export PATH=".local/bin:${PATH}"
 export PSYCLONE_CONFIG='<path-to-container>/.local/share/psyclone/psyclone.cfg'
-export FC=mpif90
+export FC=ifort
 export LDMPI=mpif90
 ````
 
-copy -p linux time executable into LFRic_container folder and point to in this file: 
+edit path to linux time executable (contained in gitrepo) into LFRic_container folder in this file: 
 `trunk/infrastructure/build/compile.mk`
 
-copy `mpif90.mk` to trunk/infrastructure/build/fortran/
+copy `mpif90.mk` and `ifort.mk` to trunk/infrastructure/build/fortran/
 
 ## 8 Build executable
 
@@ -135,9 +135,15 @@ cd trunk/gungho
 make build [-j nproc]
 ```
 ### lfric_atm
+
+ horrendous double take make 
 ```
 cd trunk/lfric_atm
+export FC=mpif90
 make build [-j nproc]
+export FC=ifort
+make build -j 8 
+
 ```
 The executables are built using the Intel compiler and associated software stack within the container and written to the local filesystem.
 ## 9 Run executable
