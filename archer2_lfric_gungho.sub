@@ -1,22 +1,22 @@
 #!/bin/sh
 #SBATCH --job-name=lfric
-#SBATCH --time=00:10:00
-#SBATCH --account=n02-cms
+#SBATCH --time=00:20:00
+#SBATCH --account=n02-TERRAMARIS
 #SBATCH --export=none
 #SBATCH --reservation=shortqos
 #SBATCH --partition=standard
 #SBATCH --qos=short
 
 #SBATCH --nodes=1
-#SBATCH --tasks-per-node=6
+#SBATCH --tasks-per-node=24
 
-export BASE_DIR=/loaction/of/base/dir
-export CONTAINER=/location/of/container/lfric_env.sif
+export BASE_DIR=/work/n02/n02/hburns/LFRic_container/LFRic_container
+export CONTAINER=/work/n02/n02/hburns/LFRic_container/LFRic_container/lfric_env.sif
 
-cd $BASE_DIR/trunk/gungho/example
+cd $BASE_DIR/trunk/miniapps/gungho_model/example/
 
 SHARED_ARGS="--distribution=block:block --hint=nomultithread"
-export LOCAL_LD_LIBRARY_PATH="/opt/cray/pe/mpich/default/ucx/gnu/9.1/lib-abi-mpich:/opt/cray/libfabric/1.11.0.4.71/lib64:/opt/cray/pe/pmi/default/lib:\$LD_LIBRARY_PATH"
-export BIND_OPT="-B /opt/cray,/usr/lib64:/usr/lib/host,/var/spool/slurmd,/mnt/lustre,/work/n02"
+export LOCAL_LD_LIBRARY_PATH="/opt/cray/pe/mpich/default/ucx/gnu/9.1/lib-abi-mpich:/opt/cray/libfabric/1.12.1.2.2.0.0/lib64:/opt/cray/pe/pmi/default/lib:/opt/cray/pe/lib64:\$LD_LIBRARY_PATH"
+export BIND_OPT="-B /opt/cray,/usr/lib64:/usr/lib/host,/var/spool/slurmd,/mnt/lustre,/work/n02,/opt/cray/pe/lib64/libpals.so.0"
 
-srun $SHARED_ARGS singularity exec $BIND_OPT --env=LD_LIBRARY_PATH=$LOCAL_LD_LIBRARY_PATH $CONTAINER ../bin/gungho configuration.nml
+srun $SHARED_ARGS singularity exec $BIND_OPT --env=LD_LIBRARY_PATH=$LOCAL_LD_LIBRARY_PATH $CONTAINER ../bin/gungho_model configuration.nml
