@@ -149,6 +149,8 @@ The executables are built using the Intel compiler and associated software stack
 ## 9 Run executable
 This is run insider the container on the command line and uses the MPI runtime libraries built into in the container.
 ### gungho
+
+if this is crazy slow on ARCHER2 run without MPI  
 ```
 cd example
 mpiexec -np 6 ../bin/gungho configuration.nml
