@@ -101,21 +101,23 @@ export PYTHONPATH=$ROSE_PICKER/lib/python:$PYTHONPATH
 export PATH=$ROSE_PICKER/bin:$PATH
 ```
 
-## 7 Edit ifort.mk
 
-There are issues with the MPI, the Intel compiler and Fortran08 C bindings, please see [https://code.metoffice.gov.uk/trac/lfric/ticket/2273](URL) for more information. Edit ifork.mk.
-```
-vi trunk/infrastructure/build/fortran/ifort.mk
-```
-and change the line
-```
-FFLAGS_WARNINGS           = -warn all -warn errors
-```
-to
-```
-FFLAGS_WARNINGS           = -warn all,noexternal -warn errors
-```
-Note: `nano` is also available in the container environment.
+
+## 7 Upgrade Psyclone and fix paths
+
+````bash
+pip install --upgrade psyclone`
+export FPP='cpp -traditional-cpp'
+export PATH=".local/bin:${PATH}"
+export PSYCLONE_CONFIG='<path-to-container>/.local/share/psyclone/psyclone.cfg'
+export FC=mpif90
+export LDMPI=mpif90
+````
+
+copy -p linux time executable into LFRic_container folder and point to in this file: 
+`trunk/infrastructure/build/compile.mk`
+
+copy `mpif90.mk` to trunk/infrastructure/build/fortran/
 
 ## 8 Build executable
 
