@@ -1,0 +1,248 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%files
+files/mk_arch_files_intel.sh /opt
+files/keyword.cfg /opt
+files/mosrs-cache-password       /opt
+files/mosrs-check       /opt
+files/mosrs-setup-gpg-agent       /opt
+files/psyclone_new.cfg            /opt
+####      files/container.tgz /opt
+
+%post
+# Build stack
+
+
+#Update and install pre-built software stack. 
+apt-get -y update 
+apt-get -y install ibutils iproute2 kmod 
+apt-get -y install build-essential make cmake git python2 python3 python3-pip automake wget python3-pycurl subversion vim gcc gfortran  hostname nano procps psmisc rsync python3-sphinx csh bzip2 mpich m4 zlib1g-dev subversion  libxml2-dev curl libcurl4-openssl-dev unzip
+
+#set locale
+export LC_ALL=C
+
+#### cd /&&tar zxvf /opt/container.tgz
+
+BUILD_DIR=/opt/build
+BASE_DIR=/container
+mkdir -p $BASE_DIR
+mkdir -p $BUILD_DIR
+
+NCORES=8
+
+FCM_VERSION=2017.10.0
+CYLC_VERSION=7.8.1
+ROSE_VERSION=2019.01.1
+
+MPICH=3.3.2
+HDF5=1.13.3
+NETCDF4=4.9.2
+NETCDF_FORTRAN=4.5.3
+NETCDF_CXX=4.2
+YAXT=0.9.2.1
+PFUNIT=3.2.9
+PSYCLONE=2.3.1
+
+#fcm
+cd $BASE_DIR
+wget https://github.com/metomi/fcm/archive/${FCM_VERSION}.tar.gz && \
+            tar xfz ${FCM_VERSION}.tar.gz && \
+      	    rm -f ${FCM_VERSION}.tar.gz fcm && \
+      	    ln -s fcm-${FCM_VERSION} fcm
+cp /opt/keyword*.cfg fcm/etc/fcm
+rm -f /opt/keyword*.cfg
+cp /opt/mo* fcm/bin
+rm -f /opt/mo*
+
+#cylc
+cd $BASE_DIR
+wget https://github.com/cylc/cylc/archive/${CYLC_VERSION}.tar.gz && \
+             tar xfz ${CYLC_VERSION}.tar.gz && \
+       	     cd cylc-flow-${CYLC_VERSION} && \
+       	     export PATH=$PWD/bin:$PATH && \
+       	     make
+cd $BASE_DIR && rm -f ${CYLC_VERSION}.tar.gz cylc && ln -s cylc-flow-${CYLC_VERSION} cylc
+
+#rose note:Requires python2, and pip needs to be installed manually.
+cd $BASE_DIR
+curl https://bootstrap.pypa.io/pip/2.7/get-pip.py -o get-pip.py
+python2 get-pip.py
+python2 -m pip install requests
+rm get-pip.py
+wget https://github.com/metomi/rose/archive/${ROSE_VERSION}.tar.gz && \
+             tar xfz ${ROSE_VERSION}.tar.gz && \
+       	     rm -f ${ROSE_VERSION}.tar.gz rose && \
+       	     ln -s rose-${ROSE_VERSION} rose
+
+
+export NETCDF_DIR=$BASE_DIR/netcdf
+export MPICH_DIR=$BASE_DIR/mpich
+export INSTALL_DIR=$BASE_DIR/usr
+export CPPFLAGS="-I$INSTALL_DIR/include -I$NETCDF_DIR/include"
+export FFLAGS="-I$INSTALL_DIR/include -I$NETCDF_DIR/include"
+export LDFLAGS="-L$INSTALL_DIR/lib -L$NETCDF_DIR/lib"
+export PATH=$MPICH_DIR/bin:$NETCDF_DIR/bin:$INSTALL_DIR/bin:$PATH
+export LD_LIBRARY_PATH=$MPICH_DIR/lib:$NETCDF_DIR/lib:$INSTALL_DIR/lib:$LD_LIBRARY_PATH
+
+
+apt-get -y install g++ # some distros don't come with any version of g++ by default
+#cd $BUILD_DIR
+#wget ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-8.1.0/gcc-8.1.0.tar.gz
+#tar -xzf gcc-8.1.0.tar.gz
+#cd gcc-8.1.0
+#./contrib/download_prerequisites
+#cd ..
+#mkdir gcc-8.1.0_build
+#cd gcc-8.1.0_build
+#../gcc-8.1.0/configure --prefix=$INSTALL_DIR --enable-languages=c,c++,fortran --disable-multilib
+#make -j $NCORES
+#make install
+
+#mpich
+#cd $BUILD_DIR
+#wget http://www.mpich.org/static/downloads/3.2/mpich-3.2.tar.gz
+#tar -xzf mpich-3.2.tar.gz
+#mkdir mpich-3.2_build
+#cd mpich-3.2_build
+#wget http://www.mpich.org/static/downloads/$MPICH/mpich-$MPICH.tar.gz
+#tar -xzf mpich-$MPICH.tar.gz
+#cd mpich-$MPICH
+#FC=gfortran FFLAGS="-w -fallow-argument-mismatch -O2" ../mpich-3.2/configure --prefix=$MPICH_DIR --enable-fortran=all --enable-cxx --enable-threads=multiple --enable-shared --enable-romio
+#make -j$NCORES
+#make install
+
+#hdf5
+cd $BUILD_DIR
+wget http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.13/hdf5-$HDF5/src/hdf5-$HDF5.tar.gz
+tar -xzf hdf5-$HDF5.tar.gz
+cd $BUILD_DIR/hdf5-$HDF5
+CC=mpicc FC=mpif90 ./configure --prefix=$INSTALL_DIR --enable-shared --enable-fortran --enable-fortran2003 --enable-parallel --enable-hl --enable-shared --enable-static --with-zlib --with-szlib=/usr/local 
+make -j$NCORES
+make install
+
+cd $BUILD_DIR
+#wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.9.2.tar.gz
+wget https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netcdf-c-4.9.2.tar.gz
+tar -xzf netcdf-c-4.9.2.tar.gz
+#mkdir netcdf-c-4.9.2_build
+cd netcdf-c-4.9.2
+#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/netcdf-c-4.9.2/config.guess
+#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/netcdf-c-4.9.2/config.sub
+CC=mpicc CXX=mpicxx FF=mpif90 FC=mpif90 ./configure --prefix=$NETCDF_DIR --disable-dap --disable-dap-remote-tests
+#CC=mpicc CXX=mpicxx FF=mpif90 FC=mpif90 $BUILD_DIR/netcdf-c-4.9.2/configure --prefix=$NETCDF_DIR
+make -j $NCORES
+make check # This runs checks, so check results before installing
+make install
+
+export LIBS="-lnetcdf -lhdf5_hl -lhdf5 -ldl -lm -lz"
+
+cd $BUILD_DIR
+wget https://downloads.unidata.ucar.edu/netcdf-fortran/4.5.3/netcdf-fortran-4.5.3.tar.gz
+tar -xzf netcdf-fortran-4.5.3.tar.gz
+#mkdir netcdf-fortran-4.5.3_build
+cd netcdf-fortran-4.5.3
+#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/netcdf-fortran-4.5.3/config.guess
+#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/netcdf-fortran-4.5.3/config.sub
+CC=mpicc CXX=mpicxx FF=mpif90 FC=mpif90 ./configure --prefix=$NETCDF_DIR
+make -j $NCORES
+make check # This runs checks, so check results before installing
+make install
+
+cd $BUILD_DIR
+wget https://downloads.unidata.ucar.edu/netcdf-cxx/4.2/netcdf-cxx-4.2.tar.gz
+tar -xzf netcdf-cxx-4.2.tar.gz
+#mkdir netcdf-cxx-4.2_build
+cd netcdf-cxx-4.2
+#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/netcdf-cxx-4.2/config.guess
+#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/netcdf-cxx-4.2/config.sub
+CC=mpicc CXX=mpicxx FF=mpif90 FC=mpif90 ./configure --prefix=$NETCDF_DIR
+make -j $NCORES
+make check # This runs checks, so check results before installing
+make install
+
+
+export LIBS='-lnetcdff -lnetcdf -lhdf5_hl -lhdf5'
+
+#yaxt
+cd $BUILD_DIR
+#wget https://www.dkrz.de/redmine/attachments/download/520/yaxt-$YAXT.tar.gz
+wget https://www.dkrz.de/redmine/attachments/download/515/yaxt-0.9.2.1.tar.gz
+tar -xzf yaxt-$YAXT.tar.gz
+cd $BUILD_DIR/yaxt-$YAXT
+./configure --prefix=$INSTALL_DIR --with-idxtype=long CC=mpicc FC=mpif90 FPP="mpif90 -E -cpp" --enable-static=yes --enable-shared=false --without-regard-for quality
+make -j$NCORES
+make install
+
+
+#XIOS
+#use mk_arch_files.sh 
+cd $BUILD_DIR
+export HDF5_DIR=$NETCDF_DIR 
+svn co http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/trunk@2252 XIOS 
+cd $BUILD_DIR/XIOS
+MY_FFLAGS="-ffree-line-length-200"
+\cp arch/arch-GCC_LINUX.fcm arch/arch-GCC_LINUX.fcm.original
+      sed -i "s|\(^%BASE_FFLAGS.*$\)|\1 ${MY_FFLAGS}|g" arch/arch-GCC_LINUX.fcm
+./make_xios \
+        --arch GCC_LINUX \
+        --full \
+        --job 8 && 
+
+cp -r lib $INSTALL_DIR
+cp inc/* $INSTALL_DIR/include
+mkdir -p $INSTALL_DIR/bin
+cp bin/* $INSTALL_DIR/bin
+rm -f /opt/mk_arch_files_intel.sh
+
+#pFUnit
+cd $BUILD_DIR
+wget https://sourceforge.net/projects/pfunit/files/latest/download/pFUnit-$PFUNIT.tgz
+tar -xzf pFUnit-$PFUNIT.tgz
+cd pFUnit-$PFUNIT
+export F90_VENDOR=gnu
+export F90=gfortran
+export MPIF90=mpif90
+#Hack for python2
+ln -s /usr/bin/python2 $INSTALL_DIR/bin/python
+make -j $NCORES
+make install
+rm $INSTALL_DIR/bin/python
+
+#Clean up
+cd $BASE_DIR
+rm -fr $BUILD_DIR
+
+#Psyclone
+python3 -m pip install --no-cache-dir  --upgrade pip
+#python3 -m pip install --upgrade setuptools
+python3 -m pip install Jinja2
+python3 -m pip install PSyclone==$PSYCLONE
+ln -s /usr/bin/python3 $INSTALL_DIR/bin/python
+mv /opt/psyclone_new.cfg /container/psyclone_new.cfg
+
+
+%environment
+
+export LC_ALL=C
+export BASE_DIR=/container
+export INSTALL_DIR=$BASE_DIR/usr
+export MPICH_DIR=$BASE_DIR/mpich
+export PFUNIT=$INSTALL_DIR
+export NETCDF_DIR=$BASE_DIR/netcdf
+export CPPFLAGS="-I$INSTALL_DIR/include -I$NETCDF_DIR/include"
+export FFLAGS="-I$INSTALL_DIR/include -I$INSTALL_DIR/mod -I$NETCDF_DIR/include -I$MPICH_DIR/include"
+export LDFLAGS="-L$INSTALL_DIR/lib -L$NETCDF_DIR/lib"
+export PATH=$MPICH_DIR/bin:$NETCDF_DIR/bin:$INSTALL_DIR/bin:$BASE_DIR/fcm/bin:$BASE_DIR/rose/bin:$BASE_DIR/clyc/bin:$PATH
+export PSYCLONE_CONFIG=/container/psyclone_new.cfg
+
+#Library path
+export LD_LIBRARY_PATH="$LOCAL_LD_LIBRARY_PATH:$MPICH_DIR/lib:$NETCDF_DIR/lib:$INSTALL_DIR/lib:/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH:/usr/lib64:/usr/lib64/libibverbs:/usr/lib/host"
+
+export FC=gfortran
+export FPP="cpp -traditional-cpp"
+export LDMPI=mpif90
+
+%runscript
+#Unset CRAY program env
+unset PE_ENV
