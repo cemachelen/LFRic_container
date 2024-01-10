@@ -3,6 +3,7 @@ From: ubuntu:22.04
 
 %files
 files/mk_arch_files_intel.sh /opt
+files/arch-GCC_LINUX.env /opt
 files/keyword.cfg /opt
 files/mosrs-cache-password       /opt
 files/mosrs-check       /opt
@@ -17,7 +18,7 @@ files/psyclone_new.cfg            /opt
 #Update and install pre-built software stack. 
 apt-get -y update 
 apt-get -y install ibutils iproute2 kmod 
-apt-get -y install build-essential make cmake git python2 python3 python3-pip automake wget python3-pycurl subversion vim gcc gfortran  hostname nano procps psmisc rsync python3-sphinx csh bzip2 mpich m4 zlib1g-dev subversion  libxml2-dev curl libcurl4-openssl-dev unzip
+apt-get -y install build-essential make cmake git python2 python3 python3-pip automake wget python3-pycurl subversion vim gcc gfortran  hostname nano procps psmisc rsync python3-sphinx csh bzip2 mpich m4 zlib1g-dev subversion  libxml2-dev curl libcurl4-openssl-dev unzip emacs time liburi-perl perl libperl-dev libdbd-mysql-perl libdatetime-perl libjson-perl libxml-simple-perl libtest-simple-perl
 
 #set locale
 export LC_ALL=C
@@ -54,6 +55,8 @@ cp /opt/keyword*.cfg fcm/etc/fcm
 rm -f /opt/keyword*.cfg
 cp /opt/mo* fcm/bin
 rm -f /opt/mo*
+
+cp -p /usr/lib/gnupg2/gpg* /usr/libexec/
 
 #cylc
 cd $BASE_DIR
@@ -117,7 +120,7 @@ cd $BUILD_DIR
 wget http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.13/hdf5-$HDF5/src/hdf5-$HDF5.tar.gz
 tar -xzf hdf5-$HDF5.tar.gz
 cd $BUILD_DIR/hdf5-$HDF5
-CC=mpicc FC=mpif90 ./configure --prefix=$INSTALL_DIR --enable-shared --enable-fortran --enable-fortran2003 --enable-parallel --enable-hl --enable-shared --enable-static --with-zlib --with-szlib=/usr/local 
+CC=mpicc FC=mpif90 ./configure --prefix=$NETCDF_DIR --enable-shared --enable-fortran --enable-fortran2003 --enable-parallel --enable-hl --enable-shared --enable-static --with-zlib --with-szlib=/usr/local 
 make -j$NCORES
 make install
 
@@ -170,30 +173,35 @@ cd $BUILD_DIR
 wget https://www.dkrz.de/redmine/attachments/download/515/yaxt-0.9.2.1.tar.gz
 tar -xzf yaxt-$YAXT.tar.gz
 cd $BUILD_DIR/yaxt-$YAXT
-./configure --prefix=$INSTALL_DIR --with-idxtype=long CC=mpicc FC=mpif90 FPP="mpif90 -E -cpp" --enable-static=yes --enable-shared=false --without-regard-for quality
-make -j$NCORES
+./configure --prefix=$INSTALL_DIR --with-idxtype=long CC=mpicc FC=mpif90 FPP="mpif90 -E -cpp" --enable-static=yes --enable-shared=false --without-regard-for-quality
+make -j $NCORES
 make install
 
 
 #XIOS
 #use mk_arch_files.sh 
 cd $BUILD_DIR
+export NETCDF_DIR
 export HDF5_DIR=$NETCDF_DIR 
 svn co http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/trunk@2252 XIOS 
 cd $BUILD_DIR/XIOS
+#/opt/mk_arch_files_intel.sh INTEL_MPI
 MY_FFLAGS="-ffree-line-length-200"
-\cp arch/arch-GCC_LINUX.fcm arch/arch-GCC_LINUX.fcm.original
+cp arch/arch-GCC_LINUX.fcm arch/arch-GCC_LINUX.fcm.original
       sed -i "s|\(^%BASE_FFLAGS.*$\)|\1 ${MY_FFLAGS}|g" arch/arch-GCC_LINUX.fcm
+cp arch/arch-GCC_LINUX.env arch/arch-GCC_LINUX.env.original
+cp /opt/arch-GCC_LINUX.env arch/ 
 ./make_xios \
         --arch GCC_LINUX \
         --full \
+        --fcm-new
         --job 8 && 
 
 cp -r lib $INSTALL_DIR
 cp inc/* $INSTALL_DIR/include
 mkdir -p $INSTALL_DIR/bin
 cp bin/* $INSTALL_DIR/bin
-rm -f /opt/mk_arch_files_intel.sh
+
 
 #pFUnit
 cd $BUILD_DIR
@@ -204,10 +212,12 @@ export F90_VENDOR=gnu
 export F90=gfortran
 export MPIF90=mpif90
 #Hack for python2
-ln -s /usr/bin/python2 $INSTALL_DIR/bin/python
+#ln -s /usr/bin/python2 $INSTALL_DIR/bin/python
+cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DMPI=YES -DOPENMP=YES -DROBUST=YES -DMAX_RANK=6 ../pFUnit-3.2.9
 make -j $NCORES
+make tests
 make install
-rm $INSTALL_DIR/bin/python
+#rm $INSTALL_DIR/bin/python
 
 #Clean up
 cd $BASE_DIR
@@ -218,6 +228,10 @@ python3 -m pip install --no-cache-dir  --upgrade pip
 #python3 -m pip install --upgrade setuptools
 python3 -m pip install Jinja2
 python3 -m pip install PSyclone==$PSYCLONE
+python3 -m pip install scitools-iris
+python3 -m pip install geovista
+python3 -m pip install esmf_regrid
+python3 -m pip install ipython
 ln -s /usr/bin/python3 $INSTALL_DIR/bin/python
 mv /opt/psyclone_new.cfg /container/psyclone_new.cfg
 
@@ -245,4 +259,4 @@ export LDMPI=mpif90
 
 %runscript
 #Unset CRAY program env
-unset PE_ENV
+#unset PE_ENV
