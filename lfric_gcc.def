@@ -2,7 +2,6 @@ Bootstrap: docker
 From: ubuntu:22.04
 
 %files
-files/mk_arch_files_intel.sh /opt
 files/arch-GCC_LINUX.env /opt
 files/keyword.cfg /opt
 files/mosrs-cache-password       /opt
@@ -90,30 +89,7 @@ export LD_LIBRARY_PATH=$MPICH_DIR/lib:$NETCDF_DIR/lib:$INSTALL_DIR/lib:$LD_LIBRA
 
 
 apt-get -y install g++ # some distros don't come with any version of g++ by default
-#cd $BUILD_DIR
-#wget ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-8.1.0/gcc-8.1.0.tar.gz
-#tar -xzf gcc-8.1.0.tar.gz
-#cd gcc-8.1.0
-#./contrib/download_prerequisites
-#cd ..
-#mkdir gcc-8.1.0_build
-#cd gcc-8.1.0_build
-#../gcc-8.1.0/configure --prefix=$INSTALL_DIR --enable-languages=c,c++,fortran --disable-multilib
-#make -j $NCORES
-#make install
 
-#mpich
-#cd $BUILD_DIR
-#wget http://www.mpich.org/static/downloads/3.2/mpich-3.2.tar.gz
-#tar -xzf mpich-3.2.tar.gz
-#mkdir mpich-3.2_build
-#cd mpich-3.2_build
-#wget http://www.mpich.org/static/downloads/$MPICH/mpich-$MPICH.tar.gz
-#tar -xzf mpich-$MPICH.tar.gz
-#cd mpich-$MPICH
-#FC=gfortran FFLAGS="-w -fallow-argument-mismatch -O2" ../mpich-3.2/configure --prefix=$MPICH_DIR --enable-fortran=all --enable-cxx --enable-threads=multiple --enable-shared --enable-romio
-#make -j$NCORES
-#make install
 
 #hdf5
 cd $BUILD_DIR
@@ -125,15 +101,12 @@ make -j$NCORES
 make install
 
 cd $BUILD_DIR
-#wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.9.2.tar.gz
 wget https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netcdf-c-4.9.2.tar.gz
 tar -xzf netcdf-c-4.9.2.tar.gz
-#mkdir netcdf-c-4.9.2_build
 cd netcdf-c-4.9.2
-#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/netcdf-c-4.9.2/config.guess
-#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/netcdf-c-4.9.2/config.sub
+wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/netcdf-c-4.9.2/config.guess
+wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/netcdf-c-4.9.2/config.sub
 CC=mpicc CXX=mpicxx FF=mpif90 FC=mpif90 ./configure --prefix=$NETCDF_DIR --disable-dap --disable-dap-remote-tests
-#CC=mpicc CXX=mpicxx FF=mpif90 FC=mpif90 $BUILD_DIR/netcdf-c-4.9.2/configure --prefix=$NETCDF_DIR
 make -j $NCORES
 make check # This runs checks, so check results before installing
 make install
@@ -143,10 +116,9 @@ export LIBS="-lnetcdf -lhdf5_hl -lhdf5 -ldl -lm -lz"
 cd $BUILD_DIR
 wget https://downloads.unidata.ucar.edu/netcdf-fortran/4.5.3/netcdf-fortran-4.5.3.tar.gz
 tar -xzf netcdf-fortran-4.5.3.tar.gz
-#mkdir netcdf-fortran-4.5.3_build
 cd netcdf-fortran-4.5.3
-#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/netcdf-fortran-4.5.3/config.guess
-#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/netcdf-fortran-4.5.3/config.sub
+wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/netcdf-fortran-4.5.3/config.guess
+wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/netcdf-fortran-4.5.3/config.sub
 CC=mpicc CXX=mpicxx FF=mpif90 FC=mpif90 ./configure --prefix=$NETCDF_DIR
 make -j $NCORES
 make check # This runs checks, so check results before installing
@@ -155,10 +127,9 @@ make install
 cd $BUILD_DIR
 wget https://downloads.unidata.ucar.edu/netcdf-cxx/4.2/netcdf-cxx-4.2.tar.gz
 tar -xzf netcdf-cxx-4.2.tar.gz
-#mkdir netcdf-cxx-4.2_build
 cd netcdf-cxx-4.2
-#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/netcdf-cxx-4.2/config.guess
-#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/netcdf-cxx-4.2/config.sub
+wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/netcdf-cxx-4.2/config.guess
+wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/netcdf-cxx-4.2/config.sub
 CC=mpicc CXX=mpicxx FF=mpif90 FC=mpif90 ./configure --prefix=$NETCDF_DIR
 make -j $NCORES
 make check # This runs checks, so check results before installing
@@ -169,8 +140,7 @@ export LIBS='-lnetcdff -lnetcdf -lhdf5_hl -lhdf5'
 
 #yaxt
 cd $BUILD_DIR
-#wget https://www.dkrz.de/redmine/attachments/download/520/yaxt-$YAXT.tar.gz
-wget https://www.dkrz.de/redmine/attachments/download/515/yaxt-0.9.2.1.tar.gz
+wget https://www.dkrz.de/redmine/attachments/download/515/yaxt-$YAXT.tar.gz
 tar -xzf yaxt-$YAXT.tar.gz
 cd $BUILD_DIR/yaxt-$YAXT
 ./configure --prefix=$INSTALL_DIR --with-idxtype=long CC=mpicc FC=mpif90 FPP="mpif90 -E -cpp" --enable-static=yes --enable-shared=false --without-regard-for-quality
@@ -178,14 +148,12 @@ make -j $NCORES
 make install
 
 
-#XIOS
-#use mk_arch_files.sh 
+#XIOS 
 cd $BUILD_DIR
 export NETCDF_DIR
 export HDF5_DIR=$NETCDF_DIR 
 svn co http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/trunk@2252 XIOS 
 cd $BUILD_DIR/XIOS
-#/opt/mk_arch_files_intel.sh INTEL_MPI
 MY_FFLAGS="-ffree-line-length-200"
 cp arch/arch-GCC_LINUX.fcm arch/arch-GCC_LINUX.fcm.original
       sed -i "s|\(^%BASE_FFLAGS.*$\)|\1 ${MY_FFLAGS}|g" arch/arch-GCC_LINUX.fcm
@@ -197,7 +165,6 @@ cp /opt/arch-GCC_LINUX.env arch/
         --fcm-new
         --job 8 && 
 
-#mkdir -p $INSTALL_DIR/lib
 cp lib/* $INSTALL_DIR/lib
 cp inc/* $INSTALL_DIR/include
 mkdir -p $INSTALL_DIR/bin
@@ -213,7 +180,6 @@ export F90_VENDOR=gnu
 export F90=gfortran
 export MPIF90=mpif90
 #Hack for python2
-#ln -s /usr/bin/python2 $INSTALL_DIR/bin/python
 cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DMPI=YES -DOPENMP=YES -DROBUST=YES -DMAX_RANK=6 ../pFUnit-3.2.9
 make -j $NCORES
 make tests
