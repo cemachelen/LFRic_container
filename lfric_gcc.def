@@ -43,7 +43,7 @@ NETCDF_FORTRAN=4.5.3
 NETCDF_CXX=4.2
 YAXT=0.9.2.1
 PFUNIT=3.2.9
-PSYCLONE=2.3.1
+PSYCLONE=2.4.0
 
 #fcm
 cd $BASE_DIR
@@ -197,7 +197,8 @@ cp /opt/arch-GCC_LINUX.env arch/
         --fcm-new
         --job 8 && 
 
-cp -r lib $INSTALL_DIR
+#mkdir -p $INSTALL_DIR/lib
+cp lib/* $INSTALL_DIR/lib
 cp inc/* $INSTALL_DIR/include
 mkdir -p $INSTALL_DIR/bin
 cp bin/* $INSTALL_DIR/bin
@@ -251,7 +252,7 @@ export PATH=$MPICH_DIR/bin:$NETCDF_DIR/bin:$INSTALL_DIR/bin:$BASE_DIR/fcm/bin:$B
 export PSYCLONE_CONFIG=/container/psyclone_new.cfg
 
 #Library path
-export LD_LIBRARY_PATH="$LOCAL_LD_LIBRARY_PATH:$MPICH_DIR/lib:$NETCDF_DIR/lib:$INSTALL_DIR/lib:/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH:/usr/lib64:/usr/lib64/libibverbs:/usr/lib/host"
+export LD_LIBRARY_PATH="$LOCAL_LD_LIBRARY_PATH:$MPICH_DIR/lib:$NETCDF_DIR/lib:$INSTALL_DIR/lib:$LD_LIBRARY_PATH:/usr/lib64:/usr/lib64/libibverbs:/usr/lib/host"
 
 export FC=gfortran
 export FPP="cpp -traditional-cpp"
