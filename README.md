@@ -131,7 +131,7 @@ This is run insider the container on the command line and uses the MPI runtime l
   
 ```
 cd example
-mpiexec -np 6 ../bin/gungho configuration.nml
+mpiexec -np 6 ../bin/gungho_model configuration.nml
 ```
 
 ### lfric_atm
