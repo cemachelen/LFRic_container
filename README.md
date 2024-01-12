@@ -124,6 +124,7 @@ make build [-j nproc]
 The executables are built using the GNU compiler and associated software stack within the container and written to the local filesystem.
 
 ## 9 Run executable
+
 This is run insider the container on the command line and uses the MPI runtime libraries built into in the container.
 
 ### gungho
@@ -131,7 +132,7 @@ This is run insider the container on the command line and uses the MPI runtime l
   
 ```
 cd example
-mpiexec -np 6 ../bin/gungho_model configuration.nml
+../bin/gungho_model configuration.nml
 ```
 
 ### lfric_atm
