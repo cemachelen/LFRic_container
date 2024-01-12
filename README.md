@@ -1,8 +1,8 @@
 # LFRic_container
 
-A [Singularity](https://sylabs.io/) container of the [LFRic](https://www.metoffice.gov.uk/research/approach/modelling-systems/lfric) software stack built with an included [Intel one API compiler](https://software.intel.com/content/www/us/en/develop/tools/oneapi/hpc-toolkit.html).
+A [Singularity](https://sylabs.io/) container of the [LFRic](https://www.metoffice.gov.uk/research/approach/modelling-systems/lfric) software stack built. Based on [NCAS container](https://github.com/NCAS-CMS/LFRic_container) 
 
-It is based on [Fedora](https://getfedora.org/) and includes all of the software package dependencies and tools in the standard [LFRic build environment](https://code.metoffice.gov.uk/trac/lfric/wiki/LFRicTechnical/LFRicBuildEnvironment) but compiled with Intel fortran rather than gfortran, and gcc.
+It is based Ubuntu 22.04 and includes all of the software package dependencies and tools in the standard [LFRic build environment](https://code.metoffice.gov.uk/trac/lfric/wiki/LFRicTechnical/LFRicBuildEnvironment).
 
 A compiler is **not** required on the build and run machine where the container is deployed. All compilation of LFRic is done via the containerised compilers.
 
@@ -10,7 +10,7 @@ LFRic components are built using a shell within the container and the shell auto
 
 The LFRic source code is not containerised, it is retrieved as usual via subversion from within the container shell so there is no need to rebuild the container for LFRic code updates.
 
-The container is compatible with [slurm](https://slurm.schedmd.com/documentation.html), and the compiled executable can be run in batch using the local MPI libraries, if the host system has an [MPICH ABI](https://www.mpich.org/abi/) compatible MPI. An OpenMPI version is also available.
+The container is compatible with [slurm](https://slurm.schedmd.com/documentation.html), and the compiled executable can be run in batch using the local MPI libraries, if the host system has an [MPICH ABI](https://www.mpich.org/abi/) compatible MPI. 
 
 A pre-built container is available from [Sylabs Cloud](https://cloud.sylabs.io/library/simonwncas/default/lfric_env).
 
