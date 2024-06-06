@@ -16,7 +16,7 @@ A pre-built container is available from [Sylabs Cloud](https://cloud.sylabs.io/l
 
 lfric_env.def is the Singularity definition file.
 
-archer2_lfric.sub is an example ARCHER2 submission script, dirac_lfric.sub an example DiRAC HPC submission script and lotus_lfric.sub is an example OpenMPI submission script for jasmin/lotus.
+archer2_lfric.sub is an example ARCHER2 submission script
 
 
 
@@ -35,28 +35,28 @@ either:
 
 * `MPICH` compatible MPI on deployment system for use of local MPI libraries.
 
-or
-
-* `OpenMPI` compatible MPI on deployment system. Note: as OpenMPI lacks general ABI, there's a possibility that the container will not use able to use local OpenMPI libraries and will have to use the (possibly slower) containerised versions.
 
 # Workflow
 
-This assumes the `MPICH` version of the container. To use the `OpenMPI` version, replace `lfric_env` below with `lfric_openmpi_env`.
 
 ## 1 Obtain container
 either:
 
 * (Recommended) Download the latest version of the Singularity container from Sylabs Cloud Library.
 ```
-singularity pull [--disable-cache] lfric_env.sif library://simonwncas/default/lfric_env:latest
+singularity pull lfric_gcc_jan24.sif --arch amd64 library://hburns/collection/lfirc_gcc_jan24.sif:latest
+
+# or via apptainer
+apptainer pull lfric_gcc_jan24.sif --arch amd64 library://hburns/collection/lfirc_gcc_jan24.sif:latest
+
 ```
   Note: `--disable-cache` is required if using Archer2.
 
 or:
 
-* Build container using `lfric_env.def`.
+* Build container using `lfric_gcc.def`.
 ```
-sudo singularity build lfric_env.sif lfric_env.def 
+sudo singularity build lfric_gcc.sif lfric_gcc.def 
 ```
 Note: `sudo` access required. 
 
@@ -76,7 +76,7 @@ Remember to replace `myusername` with your MOSRS username.
 ## 3 Start interactive shell on container
 On deployment machine.
 ```
-singularity shell lfric_env.sif
+singularity shell lfric_gcc_jan24.sif
 ```
 Now, using the shell **inside** the container:
 
@@ -101,25 +101,7 @@ export PYTHONPATH=$ROSE_PICKER/lib/python:$PYTHONPATH
 export PATH=$ROSE_PICKER/bin:$PATH
 ```
 
-
-
-## 7 Upgrade Psyclone and fix paths
-
-````bash
-pip install --upgrade psyclone`
-export FPP='cpp -traditional-cpp'
-export PATH=".local/bin:${PATH}"
-export PSYCLONE_CONFIG='<path-to-container>/.local/share/psyclone/psyclone.cfg'
-export FC=ifort
-export LDMPI=mpif90
-````
-
-edit path to linux time executable (contained in gitrepo) into LFRic_container folder in this file: 
-`trunk/infrastructure/build/compile.mk`
-
-copy `mpif90.mk` and `ifort.mk` to trunk/infrastructure/build/fortran/
-
-## 8 Build executable
+## 7 Build executable
 
 ### ARCHER2 Only
 `PE_ENV` needs to be `unset` to ensure the LFRic build system doesn't use the Cray compiler:
@@ -131,29 +113,29 @@ unset PE_ENV
 
 ### gungho
 ```
-cd trunk/gungho
+cd trunk/miniapps/gungho_model
 make build [-j nproc]
 ```
 ### lfric_atm
 
- horrendous double take make 
+ 
 ```
 cd trunk/lfric_atm
-export FC=mpif90
 make build [-j nproc]
-export FC=ifort
-make build -j 8 
-
+ 
 ```
-The executables are built using the Intel compiler and associated software stack within the container and written to the local filesystem.
+The executables are built using the GNU compiler and associated software stack within the container and written to the local filesystem.
+
 ## 9 Run executable
+
 This is run insider the container on the command line and uses the MPI runtime libraries built into in the container.
+
 ### gungho
 
-if this is crazy slow on ARCHER2 run without MPI  
+  
 ```
 cd example
-mpiexec -np 6 ../bin/gungho configuration.nml
+../bin/gungho_model configuration.nml
 ```
 
 ### lfric_atm
