@@ -44,10 +44,10 @@ either:
 
 * (Recommended) Download the latest version of the Singularity container from Sylabs Cloud Library.
 ```
-singularity pull lfric_gcc_jan24.sif --arch amd64 library://hburns/collection/lfirc_gcc_jan24.sif:latest
+singularity pull lfric1.0_gcc_june24.sif --arch amd64 library://hburns/collection/lfric1.0_gcc_june24.sif:latest
 
 # or via apptainer
-apptainer pull lfric_gcc_jan24.sif --arch amd64 library://hburns/collection/lfirc_gcc_jan24.sif:latest
+apptainer pull lfric1.0_gcc_june24.sif --arch amd64 library://hburns/collection/lfric1.0_gcc_june24.sif:latest
 
 ```
   Note: `--disable-cache` is required if using Archer2.
@@ -76,7 +76,7 @@ Remember to replace `myusername` with your MOSRS username.
 ## 3 Start interactive shell on container
 On deployment machine.
 ```
-singularity shell lfric_gcc_jan24.sif
+singularity shell lfric1.0_gcc_june24.sif
 ```
 Now, using the shell **inside** the container:
 
@@ -88,8 +88,9 @@ and enter your password when instructed. You may be asked twice.
 
 ## 5 Download LFRic source
 ```
-fcm co https://code.metoffice.gov.uk/svn/lfric/LFRic/trunk trunk
-fcm co https://code.metoffice.gov.uk/svn/lfric/GPL-utilities/trunk rose-picker
+fcm co fcm:lfric_apps.x-tr@vn1.0 lfric_apps
+fcm co fcm:lfric.x-tr@vn1.0 lfric_core
+fcm co fcm:gplutils.x-tr@vn2.0 rose-picker
 ```
 Due to licensing concerns, the rose-picker part of the LFRic configuration system is held as a separate project.
 
@@ -113,15 +114,16 @@ unset PE_ENV
 
 ### gungho
 ```
-cd trunk/miniapps/gungho_model
-make build [-j nproc]
+cd lfric_apps/build
+./local_build.py -a gungho_model
 ```
 ### lfric_atm
 
  
 ```
-cd trunk/lfric_atm
-make build [-j nproc]
+cd lfric_apps/build
+./local_build.py -a lfric_atm
+
  
 ```
 The executables are built using the GNU compiler and associated software stack within the container and written to the local filesystem.
@@ -134,14 +136,14 @@ This is run insider the container on the command line and uses the MPI runtime l
 
   
 ```
-cd example
+cd lfric_apps/applications/gungho_model/example
 ../bin/gungho_model configuration.nml
 ```
 
 ### lfric_atm
 Single column:
 ```
-cd example
+cd lfric_apps/applications/lfric_atm/example
 ../bin/lfric_atm configuration.nml
 ```
 Global. This requires an XIOS server:
