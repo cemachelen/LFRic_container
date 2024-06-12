@@ -36,10 +36,10 @@ either:
 
 * (Recommended) Download the latest version of the Singularity container from Sylabs Cloud Library.
 ```
-singularity pull lfric_vn1_gcc_june24.sif --arch amd64 library://hburns/collection/lfric_vn1_gcc_june24.sif:latest
+singularity pull lfric_vn1_gcc_june24.sif library://hburns/collection/lfirc_vn1_gcc_june24:latest
 
 # or via apptainer
-apptainer pull lfric_vn1_gcc_june24.sif --arch amd64 library://hburns/collection/lfric_vn1_gcc_june24.sif:latest
+apptainer pull lfric_vn1_gcc_june24.sif library://hburns/collection/lfirc_vn1_gcc_june24:latest
 
 ```
   Note: `--disable-cache` is required if using Archer2.
