@@ -2,7 +2,7 @@
 
 A [Singularity](https://sylabs.io/) container of the [LFRic](https://www.metoffice.gov.uk/research/approach/modelling-systems/lfric) software stack built. Based on [NCAS container](https://github.com/NCAS-CMS/LFRic_container) 
 
-It is based Ubuntu 22.04 and includes all of the software package dependencies and tools in the standard [LFRic build environment](https://code.metoffice.gov.uk/trac/lfric/wiki/LFRicTechnical/LFRicBuildEnvironment).
+It is based Ubuntu 22.04 and includes all of the software package dependencies and tools in adapted and updated from standard [LFRic build environment](https://code.metoffice.gov.uk/trac/lfric/wiki/LFRicTechnical/LFRicBuildEnvironment). This has been tested with lfric_apps vn 1
 
 A compiler is **not** required on the build and run machine where the container is deployed. All compilation of LFRic is done via the containerised compilers.
 
@@ -16,7 +16,7 @@ A pre-built container is available from [Sylabs Cloud](https://cloud.sylabs.io/l
 
 lfric_env.def is the Singularity definition file.
 
-archer2_lfric.sub is an example ARCHER2 submission script
+archer2_lfric.sub is an example ARCHER2 submission script from a previous release
 
 
 
@@ -27,14 +27,6 @@ archer2_lfric.sub is an example ARCHER2 submission script
 
 Access to [Met Office Science Repository Service](https://code.metoffice.gov.uk)
 
-## Optional requirements
-
-`sudo` access if changes to the container are required. This can be on a different system from the LFRic build and run machine.
-
-either:
-
-* `MPICH` compatible MPI on deployment system for use of local MPI libraries.
-
 
 # Workflow
 
@@ -44,10 +36,10 @@ either:
 
 * (Recommended) Download the latest version of the Singularity container from Sylabs Cloud Library.
 ```
-singularity pull lfric1.0_gcc_june24.sif --arch amd64 library://hburns/collection/lfric1.0_gcc_june24.sif:latest
+singularity pull lfric_vn1_gcc_june24.sif --arch amd64 library://hburns/collection/lfric_vn1_gcc_june24.sif:latest
 
 # or via apptainer
-apptainer pull lfric1.0_gcc_june24.sif --arch amd64 library://hburns/collection/lfric1.0_gcc_june24.sif:latest
+apptainer pull lfric_vn1_gcc_june24.sif --arch amd64 library://hburns/collection/lfric_vn1_gcc_june24.sif:latest
 
 ```
   Note: `--disable-cache` is required if using Archer2.
@@ -56,9 +48,9 @@ or:
 
 * Build container using `lfric_gcc.def`.
 ```
-sudo singularity build lfric_gcc.sif lfric_gcc.def 
+singularity build lfric_gcc.sif lfric_gcc.def 
 ```
-Note: `sudo` access required. 
+
 
 ## 2 Set up MOSRS account info
 **One time only.** Edit (or create) `~/.subversion/servers` and add the following
