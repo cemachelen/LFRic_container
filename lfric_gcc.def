@@ -43,9 +43,9 @@ HDF5=1.14.5
 NETCDF4=4.9.2
 NETCDF_FORTRAN=4.5.3
 NETCDF_CXX=4.2
-YAXT=0.9.2.1
+YAXT=0.11.3
 PFUNIT=4.10.0
-PSYCLONE=2.5.0
+PSYCLONE=3.0.0
 
 #fcm
 cd $BASE_DIR
@@ -140,20 +140,14 @@ make install
 
 export LIBS='-lnetcdff -lnetcdf -lhdf5_hl -lhdf5'
 
+
 #yaxt
 cd $BUILD_DIR
-wget https://swprojects.dkrz.de/redmine/attachments/download/515/yaxt-$YAXT.tar.gz
+wget https://swprojects.dkrz.de/redmine/attachments/download/541/yaxt-$YAXT.tar.gz
 tar -xzf yaxt-$YAXT.tar.gz
 cd $BUILD_DIR/yaxt-$YAXT
-#CC='mpicc' FC='mpif90'
-./configure --prefix=$INSTALL_DIR --with-idxtype=long CC=mpicc FC=mpif90 FPP="mpif90 -E -cpp" --enable-static=yes --enable-shared=false --without-regard-for-quality
-#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' -O $BUILD_DIR/yaxt-0.9.0#/config/config.guess
-#wget 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'  -O $BUILD_DIR/yaxt-0.9.0/#config/config.sub
-#./yaxt-0.9.0/configure --prefix=$INSTALL_DIR --with-idxtype=long CC=mpicc FC=mpif90 FPP="mpif90 -E -cpp"
-#make
-#make check
-#make install
-make -j $NCORES
+./configure --prefix=$INSTALL_DIR --with-idxtype=long CC=mpicc FC=mpif90 FPP="mpif90 -E -cpp"
+make -j$NCORES
 make install
 
 
@@ -161,7 +155,7 @@ make install
 cd $BUILD_DIR
 export NETCDF_DIR
 export HDF5_DIR=$NETCDF_DIR 
-svn --non-interactive  --trust-server-cert-failures=cn-mismatch co http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/trunk@2252 XIOS 
+svn --non-interactive --trust-server-cert-failures=cn-mismatch co https://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/trunk@2252 XIOS 
 cd $BUILD_DIR/XIOS
 MY_FFLAGS="-ffree-line-length-200"
 cp arch/arch-GCC_LINUX.fcm arch/arch-GCC_LINUX.fcm.original
@@ -203,6 +197,11 @@ rm -fr $BUILD_DIR
 python3 -m pip install --no-cache-dir  --upgrade pip
 #python3 -m pip install --upgrade setuptools
 python3 -m pip install Jinja2
+# JE - instead of using release version of PSyclone, use the latest commit to main 
+# as the release versions can be out of date
+#git clone --recursive https://github.com/stfc/PSyclone.git
+#cd PSyclone
+#pip install .[psydata]
 python3 -m pip install PSyclone==$PSYCLONE
 python3 -m pip install scitools-iris
 python3 -m pip install geovista
@@ -210,7 +209,6 @@ python3 -m pip install esmf_regrid
 python3 -m pip install ipython
 ln -s /usr/bin/python3 $INSTALL_DIR/bin/python
 mv /opt/psyclone_new.cfg /container/psyclone_new.cfg
-
 
 %environment
 
@@ -224,6 +222,7 @@ export CPPFLAGS="-I$INSTALL_DIR/include -I$NETCDF_DIR/include"
 export FFLAGS="-I$INSTALL_DIR/include -I$INSTALL_DIR/mod -I$NETCDF_DIR/include -I$MPICH_DIR/include"
 export LDFLAGS="-L$INSTALL_DIR/lib -L$NETCDF_DIR/lib"
 export PATH=$NETCDF_DIR/bin:$INSTALL_DIR/bin:$BASE_DIR/fcm/bin/:$MPICH_DIR/bin:$PATH
+# JE - use up-to-date PSyclone from git repo directly
 export PSYCLONE_CONFIG=/container/psyclone_new.cfg
 export CYLC_VERSION=8
 #Library path
