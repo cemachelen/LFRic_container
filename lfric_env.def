@@ -107,7 +107,7 @@ dnf -y install gcc-gfortran
 
 #hdf5
 cd $BUILD_DIR
-wget http://www.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.12/hdf5-$HDF5/src/hdf5-$HDF5.tar.gz
+wget https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_5/downloads/hdf5-$HDF5.tar.gz
 tar -xzf hdf5-$HDF5.tar.gz
 cd $BUILD_DIR/hdf5-$HDF5
 CC=mpicc FC=mpif90 ./configure --prefix=$NETCDF_DIR --enable-fortran --enable-fortran2003 --enable-parallel
