@@ -36,10 +36,10 @@ either:
 
 * (Recommended) Download the latest version of the Singularity container from Sylabs Cloud Library.
 ```
-singularity pull lfric_vn1_gcc_june24.sif library://hburns/collection/lfirc_vn1_gcc_june24:latest
+singularity pull lfric_gcc_jan25.sif library://hburns/collection/lfirc_gcc_jan25:latest
 
 # or via apptainer
-apptainer pull lfric_vn1_gcc_june24.sif library://hburns/collection/lfirc_vn1_gcc_june24:latest
+apptainer pull lfric_gcc_jan25.sif library://hburns/collection/lfirc_gcc_jan25:latest
 
 ```
   Note: `--disable-cache` is required if using Archer2.
@@ -75,6 +75,7 @@ Now, using the shell **inside** the container:
 ## 4 Cache MOSRS password
 ```
 . mosrs-setup-gpg-agent
+mosrs-cache-password
 ```
 and enter your password when instructed. You may be asked twice.
 
@@ -111,7 +112,7 @@ cd lfric_apps/build
 ```
 ### lfric_atm
 
- 
+mosrs cache password must be ran before this: 
 ```
 cd lfric_apps/build
 ./local_build.py -a lfric_atm
