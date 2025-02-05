@@ -80,8 +80,8 @@ and enter your password when instructed. You may be asked twice.
 
 ## 5 Download LFRic source
 ```
-fcm co fcm:lfric_apps.x-tr@vn1.0 lfric_apps
-fcm co fcm:lfric.x-tr@apps1.0 lfric_core
+fcm co fcm:lfric_apps.x-tr@vn2.0 lfric_apps
+fcm co fcm:lfric.x-tr@core2.0 lfric_core
 fcm co fcm:gplutils.x-tr@43782 rose-picker #version 2 of rose picker. later versions require a pip install 
 ```
 Due to licensing concerns, the rose-picker part of the LFRic configuration system is held as a separate project.
