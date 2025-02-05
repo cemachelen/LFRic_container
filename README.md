@@ -130,14 +130,14 @@ This is run insider the container on the command line and uses the MPI runtime l
   
 ```
 cd lfric_apps/applications/gungho_model/example
-../bin/gungho_model configuration.nml
+mpirun -np 6 ../bin/gungho_model configuration.nml
 ```
 
 ### lfric_atm
 Single column:
 ```
 cd lfric_apps/applications/lfric_atm/example
-../bin/lfric_atm configuration.nml
+mpirun -np 6 ./bin/lfric_atm configuration.nml
 ```
 Global. This requires an XIOS server:
 ```
