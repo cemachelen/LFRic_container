@@ -36,10 +36,10 @@ either:
 
 * (Recommended) Download the latest version of the Singularity container from Sylabs Cloud Library.
 ```
-singularity pull lfric_vn1_gcc_june24.sif library://hburns/collection/lfirc_vn1_gcc_june24:latest
+singularity pull lfric_gcc_jan25.sif library://hburns/collection/lfirc_gcc_jan25.sif:latest
 
 # or via apptainer
-apptainer pull lfric_vn1_gcc_june24.sif library://hburns/collection/lfirc_vn1_gcc_june24:latest
+apptainer pull lfric_gcc_jan25.sif library://hburns/collection/lfirc_gcc_jan25.sif:latest
 
 ```
   Note: `--disable-cache` is required if using Archer2.
@@ -75,13 +75,14 @@ Now, using the shell **inside** the container:
 ## 4 Cache MOSRS password
 ```
 . mosrs-setup-gpg-agent
+mosrs-cache-password
 ```
 and enter your password when instructed. You may be asked twice.
 
 ## 5 Download LFRic source
 ```
-fcm co fcm:lfric_apps.x-tr@vn1.0 lfric_apps
-fcm co fcm:lfric.x-tr@apps1.0 lfric_core
+fcm co fcm:lfric_apps.x-tr@vn2.0 lfric_apps
+fcm co fcm:lfric.x-tr@core2.0 lfric_core
 fcm co fcm:gplutils.x-tr@43782 rose-picker #version 2 of rose picker. later versions require a pip install 
 ```
 Due to licensing concerns, the rose-picker part of the LFRic configuration system is held as a separate project.
@@ -111,7 +112,7 @@ cd lfric_apps/build
 ```
 ### lfric_atm
 
- 
+mosrs cache password must be ran before this: 
 ```
 cd lfric_apps/build
 ./local_build.py -a lfric_atm
@@ -129,14 +130,14 @@ This is run insider the container on the command line and uses the MPI runtime l
   
 ```
 cd lfric_apps/applications/gungho_model/example
-../bin/gungho_model configuration.nml
+mpirun -np 6 ../bin/gungho_model configuration.nml
 ```
 
 ### lfric_atm
 Single column:
 ```
 cd lfric_apps/applications/lfric_atm/example
-../bin/lfric_atm configuration.nml
+mpirun -np 6 ./bin/lfric_atm configuration.nml
 ```
 Global. This requires an XIOS server:
 ```
